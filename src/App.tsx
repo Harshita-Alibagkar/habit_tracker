@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Plus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plus, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 type Habit = {
   id: number;
@@ -98,36 +99,69 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-amber-50 to-emerald-50 p-6">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center mb-8">
+        <img
+          src="/HTIcon.jpg"
+          alt="HTLogo"
+          className="w-16 h-16 rounded-full mr-4 object-cover"
+        />
+        <div>
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-1">
+        Habit Tracker
+          </h1>
+          <p className="text-gray-600">Track your habits and stay consistent!</p>
+        </div>
+      </div>
+      <div className="flex justify-center items-center mb-8">
+        {/* Month Switcher Card */}
+        <div className="flex items-center gap-4 bg-white/80 dark:bg-gray-800/80 px-6 py-3 rounded-2xl shadow-md backdrop-blur-sm border border-gray-200 dark:border-gray-700">
           <button
             onClick={prevMonth}
-            className="text-gray-600 hover:text-gray-900 text-xl"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+            aria-label="Previous month"
           >
-            ←
+            <ChevronLeft size={22} className="text-gray-700 dark:text-gray-200" />
           </button>
-          <h1 className="text-2xl font-bold text-gray-800">
+
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-wide min-w-[180px] text-center select-none">
             {new Date(currentYear, currentMonth).toLocaleString("default", {
               month: "long",
               year: "numeric",
             })}
           </h1>
+
           <button
             onClick={nextMonth}
-            className="text-gray-600 hover:text-gray-900 text-xl"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+            aria-label="Next month"
           >
-            →
+            <ChevronRight size={22} className="text-gray-700 dark:text-gray-200" />
           </button>
         </div>
 
-        <button
+        {/* Add Button */}
+        <motion.button
           onClick={() => setShowPopup(true)}
-          className="bg-pink-500 hover:bg-pink-600 text-white rounded-full p-3 shadow-md"
+          className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-600 hover:to-fuchsia-600 text-white rounded-full p-4 shadow-2xl transition transform active:scale-95"
+          aria-label="Add Habit"
+          animate={{
+            scale: [1, 1.05, 1],
+            boxShadow: [
+              "0 0 20px rgba(236, 72, 153, 0.3)",
+              "0 0 40px rgba(217, 70, 239, 0.4)",
+              "0 0 20px rgba(236, 72, 153, 0.3)",
+            ],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
         >
-          <Plus size={20} />
-        </button>
+          <Plus size={28} className="drop-shadow-sm" />
+        </motion.button>
       </div>
+
 
       {/* Habit Table */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-2xl border border-gray-200">
@@ -179,36 +213,80 @@ const App: React.FC = () => {
       </div>
 
       {/* Popup for adding habit */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-xl shadow-xl w-80">
-            <h2 className="text-lg font-semibold mb-4 text-gray-800">
-              Add New Habit
-            </h2>
-            <input
-              type="text"
-              value={newHabitName}
-              onChange={(e) => setNewHabitName(e.target.value)}
-              className="border border-gray-300 rounded-md w-full p-2 mb-4"
-              placeholder="Habit name"
-            />
-            <div className="flex justify-end gap-3">
+      <AnimatePresence>
+        {showPopup && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-pink-100/70 via-purple-100/60 to-blue-100/70 dark:from-gray-900/80 dark:via-gray-800/80 dark:to-gray-900/80 backdrop-blur-md z-50"
+          >
+            {/* Animated Card */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 120, damping: 12 }}
+              className="relative bg-white/60 dark:bg-gray-800/70 backdrop-blur-xl border border-white/30 dark:border-gray-700 rounded-2xl shadow-2xl p-8 w-[90%] max-w-sm text-center"
+            >
+              {/* Close Button */}
               <button
                 onClick={() => setShowPopup(false)}
-                className="px-3 py-1 rounded-md bg-gray-200 hover:bg-gray-300"
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition"
               >
-                Cancel
+                <X size={22} />
               </button>
-              <button
-                onClick={addHabit}
-                className="px-3 py-1 rounded-md bg-pink-500 text-white hover:bg-pink-600"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
+              {/* Title */}
+              <h2 className="text-2xl font-extrabold mb-2 text-gray-800 dark:text-white tracking-tight">
+                Add New Habit 
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                Build something great, one day at a time.
+              </p>
+
+              {/* Input */}
+              <motion.input
+                type="text"
+                value={newHabitName}
+                onChange={(e) => setNewHabitName(e.target.value)}
+                placeholder="e.g. Drink 2L water 💧"
+                className="w-full p-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white/60 dark:bg-gray-700/50 focus:ring-2 focus:ring-pink-400 outline-none mb-6 text-gray-800 dark:text-gray-100"
+                whileFocus={{ scale: 1.02 }}
+              />
+
+              {/* Buttons */}
+              <div className="flex justify-center gap-4">
+                <motion.button
+                  onClick={() => setShowPopup(false)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-5 py-2 rounded-xl bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                >
+                  Cancel
+                </motion.button>
+
+                <motion.button
+                  onClick={addHabit}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-5 py-2 rounded-xl font-semibold text-white shadow-md bg-gradient-to-r from-pink-500 to-fuchsia-500 hover:from-pink-600 hover:to-fuchsia-600 transition"
+                >
+                  Add Habit
+                </motion.button>
+              </div>
+
+              {/* Decorative Glow Ring */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.6 }}
+                transition={{ duration: 1.2, repeat: Infinity, repeatType: "mirror" }}
+                className="absolute inset-0 -z-10 bg-gradient-to-tr from-pink-300/40 via-purple-300/40 to-blue-300/40 blur-3xl rounded-3xl"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
